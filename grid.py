@@ -1,6 +1,7 @@
 import pygame
 from color import Colors
 
+
 class Grid:
     def __init__(self):
         self.number_of_rows = 20
@@ -10,12 +11,12 @@ class Grid:
             [0 for i in range(self.number_of_columns)]
             for j in range(self.number_of_rows)
         ]
-        self.height=0
-        self.bumpiness=0
-        self.holes=0
+        self.height = 0
+        self.bumpiness = 0
+        self.holes = 0
         self.colors = Colors.get_block_colors()
 
-    def print_grid(self):  # maknit
+    def print_grid(self):
         for row in range(self.number_of_rows):
             for column in range(self.number_of_columns):
                 print(self.grid[row][column], end=" ")
@@ -82,7 +83,6 @@ class Grid:
         bumpiness = 0
         height_list = []
         holes = 0
-        grid= [row[:] for row in self.grid]
 
         for column in range(self.number_of_columns):
             for row in range(self.number_of_rows):
@@ -105,7 +105,7 @@ class Grid:
                 if self.grid[row][column] == 0:
                     holes = holes + 1
 
-        self.height=sum(height_list)
-        self.bumpiness=bumpiness
-        self.holes=holes
+        self.height = sum(height_list)
+        self.bumpiness = bumpiness
+        self.holes = holes
         return self.height, self.bumpiness, self.holes

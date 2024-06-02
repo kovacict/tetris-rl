@@ -29,56 +29,50 @@ class Agent:
             self.epsilon = self.epsilon_final
 
     def train(self):
-        #if self.n_games<256:
-            #return
-        if len(self.memory) >= 512 :
+        if len(self.memory) >= 512:
             batch = random.sample(self.memory, 512)
         else:
             batch = self.memory
+        target = []
 
-        state, reward, next_state, done = zip(*batch)
+        states, rewards, next_states, dones = zip(*batch)
 
-        #state = torch.tensor(np.array(state), dtype=torch.float)
-        #next_state = torch.tensor(np.array(next_state), dtype=torch.float)
-        #reward = torch.tensor(np.array(reward), dtype=torch.float)
+        states = torch.tensor(np.array(states), dtype=torch.float)  # ok
+        next_states = torch.tensor(np.array(next_states), dtype=torch.float)  # ok
+        rewards = torch.tensor(np.array(rewards)[:, None], dtype=torch.float)  # ok
 
-        state=torch.stack(tuple(s for s in state))
-        #state=state.to(torch.float32)
-        reward=torch.from_numpy(np.array(reward, dtype=np.float32)[:,None])
-        next_state=torch.stack(tuple(next_s for next_s in next_state))
-        #next_state=next_state.to(torch.float32)
-
-        prediction = self.model(state)
+        predictions = self.model(states)
 
         self.model.eval()
 
-        next_prediction = self.model(next_state)
+        next_prediction = self.model(next_states)
+
+        for reward, done, prediction in zip(rewards, dones, next_prediction):
+            if done:
+                target.append(reward)
+            else:
+                target.append(reward + self.gamma * prediction)
 
         self.model.train()
-        target = torch.cat(
-            tuple(
-                reward if done else reward + self.gamma * prediction
-                for reward, done, prediction in zip(reward, done, next_prediction)
-            )
-        )[:, None]
-        
-        
+
+        target = torch.stack(target)
+
         self.optimizer.zero_grad()
-        loss=self.criterion(target,prediction)
+        loss = self.criterion(target, predictions)
         loss.backward()
         self.optimizer.step()
 
     def decide_next_state(self, states):
-        max_prediction=None
-        next_state=None
+        max_prediction = None
+        next_state = None
 
-        if random.random()<self.epsilon:
-            next_state=random.choice(list(states))
+        if random.random() < self.epsilon:
+            next_state = random.choice(list(states))
         else:
             for state in states:
-                value=self.model(states[state])
+                value = self.model(states[state])
                 if not max_prediction or value > max_prediction:
-                    max_prediction=value
-                    next_state=state
+                    max_prediction = value
+                    next_state = state
 
         return next_state
