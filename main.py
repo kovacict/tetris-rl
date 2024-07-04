@@ -20,7 +20,6 @@ pygame.display.set_caption("Tetris")
 game = Game()
 
 agent = Agent()
-
 record = 0
 
 number_of_episodes = 10000
@@ -28,7 +27,7 @@ number_of_episodes = 10000
 
 while agent.n_games < number_of_episodes:
     old_state = game.get_properties()
-    next_states = game.get_next_states()
+    next_states = game.get_next_states(game, screen)
     next_state = agent.decide_next_state(next_states)
 
     game.current_block.color = Colors.white
@@ -56,7 +55,6 @@ while agent.n_games < number_of_episodes:
         agent.reduce_epsilon()
         if score > record:
             record = score
-            agent.model.save()
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:

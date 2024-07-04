@@ -29,8 +29,8 @@ class Grid:
                 block_rect = pygame.Rect(
                     column * self.block_size,
                     row * self.block_size,
-                    self.block_size,
-                    self.block_size,
+                    self.block_size - 1,
+                    self.block_size - 1,
                 )
                 pygame.draw.rect(surface, self.colors[block_value], block_rect)
 

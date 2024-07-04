@@ -3,8 +3,8 @@ from blocks import *
 import random
 import numpy as np
 import copy
-from color import Colors
 import torch
+import pygame
 
 
 class Game:
@@ -162,11 +162,10 @@ class Game:
         state = np.array([lines_cleared, height, bumpiness, holes], dtype=np.float32)
         return torch.FloatTensor(state)
 
-    def get_next_states(self):
+    def get_next_states(self, game, screen):
         starting_grid = copy.deepcopy(self.grid.grid)
         states = {}
         block_id = self.current_block.id
-        self.current_block.color = Colors.red
         if block_id == 3:  # Oblock
             rotations = [0]
         elif (
@@ -176,15 +175,25 @@ class Game:
         else:  # Tblock, Jblock, Lblock
             rotations = [0, 90, 180, 270]
         for rotation in rotations:
+            self.current_block.rotation = rotation
             min_x, max_x = self.current_block.get_min_and_max_x()
             for x in range(min_x, max_x + 1):
-                self.current_block.row_offset = 0
-                self.current_block.column_offset = 0
                 self.current_block.rotation = rotation
                 self.current_block.move(0, x)
                 while self.move_down():
+                    # remove comment so visualize every possible next state
+                    # game.render(screen)
+                    # pygame.display.update()
                     pass
+
                 states[(rotation, x)] = self.get_properties()
                 self.current_block = self.get_block(block_id)
                 self.grid.grid = copy.deepcopy(starting_grid)
+                # used to cycle through possible states
+                # wait = True
+                # while wait:
+                #   for event in pygame.event.get():
+                #       if event.type==pygame.KEYDOWN:
+                #           if event.key==pygame.K_UP:
+                #               wait=False
         return states
