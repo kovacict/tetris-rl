@@ -37,9 +37,9 @@ class Agent:
 
         states, rewards, next_states, dones = zip(*batch)
 
-        states = torch.tensor(np.array(states), dtype=torch.float)  # ok
-        next_states = torch.tensor(np.array(next_states), dtype=torch.float)  # ok
-        rewards = torch.tensor(np.array(rewards)[:, None], dtype=torch.float)  # ok
+        states = torch.tensor(np.array(states), dtype=torch.float)  
+        next_states = torch.tensor(np.array(next_states), dtype=torch.float)  
+        rewards = torch.tensor(np.array(rewards)[:, None], dtype=torch.float)
 
         predictions = self.model(states)
 
